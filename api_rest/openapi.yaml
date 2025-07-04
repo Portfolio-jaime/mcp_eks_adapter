@@ -1,0 +1,42 @@
+openapi: 3.0.0
+info:
+  title: Kubernetes Info API
+  version: 1.0.0
+servers:
+  - url: https://plates-rarely-earnings-counts.trycloudflare.com
+paths:
+  /kubernetes/version:
+    get:
+      summary: Obtener la versión de Kubernetes
+      responses:
+        '200':
+          description: Versión de Kubernetes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  kubernetes_version:
+                    type: string
+  /helm/charts:
+    get:
+      summary: Listar charts de Helm instalados
+      responses:
+        '200':
+          description: Lista de charts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  charts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        version:
+                          type: string
+                        namespace:
+                          type: string

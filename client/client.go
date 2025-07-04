@@ -18,7 +18,7 @@ func main() {
 
 	client := pb.NewModelContextServiceClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
 	resp, err := client.GetContext(ctx, &pb.ContextRequest{ClusterName: "test"})
