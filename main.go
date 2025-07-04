@@ -7,13 +7,10 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/cli"
+	"github.com/Portfolio-jaime/mcp_eks_adapter/adapters"
 
-	pb "./proto"
+	pb "github.com/Portfolio-jaime/mcp_eks_adapter/mcp/proto"
 )
 
 type server struct {
@@ -21,45 +18,16 @@ type server struct {
 }
 
 func (s *server) GetContext(ctx context.Context, req *pb.ContextRequest) (*pb.ContextResponse, error) {
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		return nil, fmt.Errorf("error creando config in-cluster: %v", err)
-	}
-
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return nil, fmt.Errorf("error creando cliente kubernetes: %v", err)
-	}
-
-	versionInfo, err := clientset.Discovery().ServerVersion()
+	version, err := adapters.GetKubernetesVersion()
 	if err != nil {
 		return nil, fmt.Errorf("error obteniendo versión k8s: %v", err)
 	}
-
-	helmSettings := cli.New()
-	actionConfig := new(action.Configuration)
-	if err := actionConfig.Init(helmSettings.RESTClientGetter(), "", "secrets", log.Printf); err != nil {
-		return nil, fmt.Errorf("error inicializando helm config: %v", err)
-	}
-
-	list := action.NewList(actionConfig)
-	list.All = true
-	releases, err := list.Run()
+	charts, err := adapters.ListHelmCharts()
 	if err != nil {
 		return nil, fmt.Errorf("error listando releases helm: %v", err)
 	}
-
-	var charts []*pb.HelmChart
-	for _, rel := range releases {
-		charts = append(charts, &pb.HelmChart{
-			Name:      rel.Name,
-			Version:   rel.Chart.Metadata.Version,
-			Namespace: rel.Namespace,
-		})
-	}
-
 	return &pb.ContextResponse{
-		KubernetesVersion: versionInfo.GitVersion,
+		KubernetesVersion: version,
 		Charts:            charts,
 	}, nil
 }

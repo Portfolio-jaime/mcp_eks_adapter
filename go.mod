@@ -1,4 +1,5 @@
-module mcp_eks_adapter
+//module github.com/jaimehenao/mcp_eks_adapter
+module github.com/Portfolio-jaime/mcp_eks_adapter
 
 go 1.22.0
 
