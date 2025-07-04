@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package mcp;
+
+// 👇 Línea clave para que funcione la generación de código Go
+option go_package = "mcp_eks_adapter/proto;mcp";
+
+service ModelContextService {
+  rpc GetContext (ContextRequest) returns (ContextResponse);
+}
+
+message ContextRequest {
+  string cluster_name = 1;
+}
+
+message ContextResponse {
+  string kubernetes_version = 1;
+  repeated HelmChart charts = 2;
+}
+
+message HelmChart {
+  string name = 1;
+  string version = 2;
+  string namespace = 3;
+}
